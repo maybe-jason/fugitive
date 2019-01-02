@@ -13,15 +13,15 @@
       <button @click='drawCard(3)'>Draw</button>
     </div>
     <div class="hideouts">
-      <Hand :hand='hideouts' :onClick="() => {}"/>
+      <Hand :hand='hideouts' :onClick='() => {}' isPlayed="[]" />
     </div>
     <div>
       <h2>Detective hand: </h2>
-      <Hand :hand='detectiveHand' />
+      <Hand :hand='detectiveHand' :onClick='() => {}' isPlayed="[]" />
       <h2>Fugitive hand: </h2>
-      <Hand :hand='proposedHideouts' :onClick='() => {}' />
+      <Hand :hand='proposedHideouts' :onClick='returnHideout' isPlayed="[]" />
         <button @click='submitHideout'>Submit</button>
-      <Hand :hand='fugitiveHand' :onClick='playHideout'        :isPlayed='proposedHideouts'/>
+      <Hand :hand='fugitiveHand' :onClick='playHideout' :isPlayed='proposedHideouts'/>
     </div>
   </div>
 </template>
@@ -38,7 +38,7 @@ export default {
   },
   data: function () {
     return {
-      firstDeck: [4,5,6,7,8,9,10,11,12,13,14],
+      firstDeck: [4,5,6,7,8,9,10,11,12,13,14].reverse(),
       secondDeck: [15,16,17,18,19,20,21,22,23,24,25,26,27,28],
       thirdDeck: [29,30,31,32,33,34,35,36,37,38,39,40,41],
       fugitiveHand: [1,2,3,42],
@@ -68,20 +68,25 @@ export default {
         }
         if (this.currentPlayer === 'Fugitive') {
           this.fugitiveHand.push(drawDeck.pop())
+          // this.fugitiveHand.sort(function(a, b){return a-b})
           this.currentPhase = 'Play'
           // this.currentPlayer = 'Detective'
         }
         else if (this.currentPlayer === 'Detective') {
           this.detectiveHand.push(drawDeck.pop())
+          // this.detectiveHand.sort(function(a, b){return a-b})
           this.currentPlayer = 'Fugitive'
         }
       }
     },
     playHideout: function (card) {
-      if (this.currentPhase === 'Play') {
+      if (this.currentPhase === 'Play' && !this.proposedHideouts.includes(card)) {
         this.proposedHideouts.push(card)
         // this.fugitiveHand.splice(this.fugitiveHand.indexOf(card), 1)
       }
+    },
+    returnHideout: function (card) {
+      this.proposedHideouts.splice(this.proposedHideouts.indexOf(card), 1)
     },
     submitHideout: function () {
       if (this.proposedHideouts.length == 1) {
@@ -89,18 +94,19 @@ export default {
           alert('add sprint cards')
         }
         else {
-          alert('ok')
+          this.hideouts.push(this.proposedHideouts[0])
+          this.fugitiveHand.splice(this.fugitiveHand.indexOf(this.proposedHideouts[0]), 1)
+          this.proposedHideouts = []
+          this.currentPhase = 'Draw'
+          this.currentPlayer = 'Detective'
         }
       }
       else if (this.proposedHideouts.length > 1) {
         const sprintCards = this.proposedHideouts.slice(1)
         const reducer = (accumulator, currentValue) => accumulator + currentValue;
         const sprintSum = sprintCards.reduce(reducer)
-        if ( (this.proposedHideouts[0] + sprintSum - this.hideouts[this.hideouts.length-1]) > 3) {
+        if ( (this.proposedHideouts[0] - sprintSum - this.hideouts[this.hideouts.length-1]) > 3) {
           alert('not in range')
-        }
-        else {
-
         }
       }
       else {
@@ -124,6 +130,7 @@ export default {
 .decks {
   display: flex;
   justify-content: center;
+  /* transform: rotate(90deg); */
 }
 
 .cards {

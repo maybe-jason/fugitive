@@ -13,7 +13,28 @@
 <script>
 export default {
   name: 'Card',
-  props: ['suit', 'value', 'image', 'onClick', 'played']
+  props: {
+    suit: {
+      type: Number,
+      required: false
+    },
+    value: {
+      type: [Number, Array],
+      required: true
+    },
+    image: {
+      type: String,
+      required: false
+    },
+    onClick: {
+      type: Function,
+      required: true
+    },
+    played: {
+      type: Boolean,
+      required: false
+    }
+  }
 }
 </script>
 

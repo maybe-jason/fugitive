@@ -1,13 +1,13 @@
 <template>
   <div class="hand">
-    <ul v-if="hand.length">
+    <ul v-if="hand.length > 0">
       <li
         is="card"
         v-for="card in hand"
         :value="card"
         :suit="card % 2 === 0 ? 2 : 1"
         :onClick="onClick"
-        :played="'isPlayed.indexOf(value)' > -1"
+        :played="isPlayed.includes(card)"
         :key='card.value'>
       </li>
     </ul>
@@ -23,7 +23,7 @@ export default {
   components: {
     Card
   },
-  props: ['hand', 'onClick', 'isPlayed'],
+  props: ['hand', 'onClick', 'isPlayed']
 }
 </script>
 
