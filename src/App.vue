@@ -2,6 +2,7 @@
   <div id="app">
     <div class="turn">
       <h1>{{ currentPlayer }}'s turn</h1>
+      <h3>{{ currentPhase }} phase</h3>
     </div>
     <div class="decks">
       <Deck :cards='firstDeck'/>
@@ -11,24 +12,27 @@
       <Deck :cards='thirdDeck'/>
       <button @click='drawCard(3)'>Draw</button>
     </div>
+    <div class="hideouts">
+      <Hand :hand='hideouts' :onClick="() => {}"/>
+    </div>
     <div>
       <h2>Detective hand: </h2>
       <Hand :hand='detectiveHand' />
       <h2>Fugitive hand: </h2>
-      <Hand :hand='fugitiveHand' />
+      <Hand :hand='proposedHideouts' :onClick='() => {}' />
+        <button @click='submitHideout'>Submit</button>
+      <Hand :hand='fugitiveHand' :onClick='playHideout'        :isPlayed='proposedHideouts'/>
     </div>
   </div>
 </template>
 
 <script>
-import Card from './components/Card'
 import Deck from './components/Deck'
 import Hand from './components/Hand'
 
 export default {
   name: 'app',
   components: {
-    Card,
     Deck,
     Hand
   },
@@ -39,32 +43,68 @@ export default {
       thirdDeck: [29,30,31,32,33,34,35,36,37,38,39,40,41],
       fugitiveHand: [1,2,3,42],
       detectiveHand: [],
+      hideouts: [0],
+      proposedHideouts: [],
       currentPlayer: 'Fugitive',
+      currentPhase: 'Draw',
       turnNumber: 1
     }
   },
   methods: {
     drawCard: function (deckNum) {
-      let drawDeck;
-      if (deckNum === 1) {
-        drawDeck = this.firstDeck
+      if (this.currentPhase === 'Draw') {
+        let drawDeck;
+        if (deckNum === 1) {
+          drawDeck = this.firstDeck
+        }
+        else if (deckNum === 2) {
+          drawDeck = this.secondDeck
+        }
+        else {
+          drawDeck = this.thirdDeck
+        }
+        if (drawDeck.length === 0) {
+          alert('deck empty!')
+        }
+        if (this.currentPlayer === 'Fugitive') {
+          this.fugitiveHand.push(drawDeck.pop())
+          this.currentPhase = 'Play'
+          // this.currentPlayer = 'Detective'
+        }
+        else if (this.currentPlayer === 'Detective') {
+          this.detectiveHand.push(drawDeck.pop())
+          this.currentPlayer = 'Fugitive'
+        }
       }
-      else if (deckNum === 2) {
-        drawDeck = this.secondDeck
+    },
+    playHideout: function (card) {
+      if (this.currentPhase === 'Play') {
+        this.proposedHideouts.push(card)
+        // this.fugitiveHand.splice(this.fugitiveHand.indexOf(card), 1)
+      }
+    },
+    submitHideout: function () {
+      if (this.proposedHideouts.length == 1) {
+        if (this.proposedHideouts[0] - this.hideouts[this.hideouts.length-1] > 3) {
+          alert('add sprint cards')
+        }
+        else {
+          alert('ok')
+        }
+      }
+      else if (this.proposedHideouts.length > 1) {
+        const sprintCards = this.proposedHideouts.slice(1)
+        const reducer = (accumulator, currentValue) => accumulator + currentValue;
+        const sprintSum = sprintCards.reduce(reducer)
+        if ( (this.proposedHideouts[0] + sprintSum - this.hideouts[this.hideouts.length-1]) > 3) {
+          alert('not in range')
+        }
+        else {
+
+        }
       }
       else {
-        drawDeck = this.thirdDeck
-      }
-      if (drawDeck.length === 0) {
-        alert('deck empty!')
-      }
-      if (this.currentPlayer === 'Fugitive') {
-        this.fugitiveHand.push(drawDeck.pop())
-        this.currentPlayer = 'Detective'
-      }
-      else if (this.currentPlayer === 'Detective') {
-        this.detectiveHand.push(drawDeck.pop())
-        this.currentPlayer = 'Fugitive'
+        alert('pass?')
       }
     }
   }

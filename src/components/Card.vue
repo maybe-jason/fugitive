@@ -1,7 +1,7 @@
 <template>
-  <div class="card">
+  <div class="card" :class='{ played: played }' @click='onClick(value)'>
     {{value}}
-    <div v-if="suit === 'odd'">
+    <div v-if="suit == 1">
       <i style="font-size: 30px;" class="fas fa-plane"></i>
     </div>
     <div v-else>
@@ -13,7 +13,7 @@
 <script>
 export default {
   name: 'Card',
-  props: ['suit', 'value', 'image']
+  props: ['suit', 'value', 'image', 'onClick', 'played']
 }
 </script>
 
@@ -31,5 +31,9 @@ export default {
   border-radius: 5px;
   font-family: "Staatliches", Times, serif;
   font-size: 50px;
+}
+
+.played {
+  opacity: 0.5;
 }
 </style>
