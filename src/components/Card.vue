@@ -1,6 +1,11 @@
 <template>
   <div class="card" :class='{ played: played }' @click='onClick(value)'>
-    {{value}}
+    <div v-if="Array.isArray(value)">
+      {{value[0]}}**
+    </div>
+    <div v-else>
+      {{value}}
+    </div>
     <div v-if="suit == 1">
       <i style="font-size: 30px;" class="fas fa-plane"></i>
     </div>
@@ -33,6 +38,10 @@ export default {
     played: {
       type: Boolean,
       required: false
+    },
+    revealed: {
+      type: Boolean,
+      required: false
     }
   }
 }
@@ -44,7 +53,6 @@ export default {
   width: 150px;
   background-color: #cc99ff;
   box-shadow: 2px 2px;
-  border-radius: 5px;
   border: 2px solid black;
   margin-right: 10px;
   text-align: left;

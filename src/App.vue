@@ -12,8 +12,14 @@
       <Deck :cards='thirdDeck'/>
       <button @click='drawCard(3)'>Draw</button>
     </div>
+    <div>
+      <DetectiveGrid :hideouts='hideouts' :guesses='detectiveGuesses' />
+    </div>
     <div class="hideouts">
-      <Hand :hand='hideouts' :onClick='() => {}' isPlayed="[]" />
+      <Hand :hand='hideouts'
+      :onClick='() => {}'
+      isPlayed="[]"
+      :revealedHideouts='revealedHideouts'/>
     </div>
     <div>
       <h2>Detective hand: </h2>
@@ -21,7 +27,10 @@
       <h2>Fugitive hand: </h2>
       <Hand :hand='proposedHideouts' :onClick='returnHideout' isPlayed="[]" />
         <button @click='submitHideout'>Submit</button>
-      <Hand :hand='fugitiveHand' :onClick='playHideout' :isPlayed='proposedHideouts'/>
+      <Hand
+      :hand='fugitiveHand'
+      :onClick='playHideout'
+      :isPlayed='proposedHideouts' />
     </div>
   </div>
 </template>
@@ -29,12 +38,14 @@
 <script>
 import Deck from './components/Deck'
 import Hand from './components/Hand'
+import DetectiveGrid from './components/DetectiveGrid.vue'
 
 export default {
   name: 'app',
   components: {
     Deck,
-    Hand
+    Hand,
+    DetectiveGrid
   },
   data: function () {
     return {
@@ -45,6 +56,8 @@ export default {
       detectiveHand: [],
       hideouts: [0],
       proposedHideouts: [],
+      detectiveGuesses: [],
+      revealedHideouts: [0],
       currentPlayer: 'Fugitive',
       currentPhase: 'Draw',
       turnNumber: 1
@@ -108,9 +121,16 @@ export default {
         if ( (this.proposedHideouts[0] - sprintSum - this.hideouts[this.hideouts.length-1]) > 3) {
           alert('not in range')
         }
+        else {
+          alert('ok')
+          this.hideouts.push(this.proposedHideouts)
+          this.currentPhase = 'Draw'
+          this.currentPlayer = 'Detective'
+        }
       }
       else {
-        alert('pass?')
+        this.currentPhase = 'Draw'
+        this.currentPlayer = 'Detective'
       }
     }
   }
@@ -133,8 +153,4 @@ export default {
   /* transform: rotate(90deg); */
 }
 
-.cards {
-  display: flex;
-  justify-content: center;
-}
 </style>

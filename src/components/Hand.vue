@@ -1,5 +1,5 @@
 <template>
-  <div class="hand">
+  <div>
     <ul v-if="hand.length > 0">
       <li
         is="card"
@@ -23,7 +23,7 @@ export default {
   components: {
     Card
   },
-  props: ['hand', 'onClick', 'isPlayed']
+  props: ['hand', 'onClick', 'isPlayed', 'revealedHideouts']
 }
 </script>
 
