@@ -94,7 +94,7 @@ export default {
         else if (this.currentPlayer === 'Detective') {
           this.detectiveHand.push(drawDeck.pop())
           // this.detectiveHand.sort(function(a, b){return a-b})
-          this.currentPlayer = 'Fugitive'
+          this.currentPhase = 'Guess'
         }
       }
     },
@@ -140,13 +140,15 @@ export default {
       }
     },
     makeGuess: function (number) {
-      this.detectiveGuesses.push(number)
-      if (this.hideouts.includes(number)) {
-        this.revealedHideouts.push(number)
-        alert('GOTTEM!')
+      if (this.currentPhase === 'Guess' && !this.detectiveGuesses.includes(number)) {
+        this.detectiveGuesses.push(number)
+        if (this.hideouts.includes(number)) {
+          this.revealedHideouts.push(number)
+          alert('GOTTEM!')
+        }
+        this.currentPhase = 'Draw'
+        this.currentPlayer = 'Fugitive'
       }
-      this.currentPhase = 'Draw'
-      this.currentPlayer = 'Fugitive'
     }
   }
 }
