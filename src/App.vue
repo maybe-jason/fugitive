@@ -13,7 +13,7 @@
       <button @click='drawCard(3)'>Draw</button>
     </div>
     <div>
-      <DetectiveGrid :hideouts='hideouts' :guesses='detectiveGuesses' />
+      <DetectiveGrid :hideouts='hideouts' :guesses='detectiveGuesses' :onClick='makeGuess'/>
     </div>
     <div class="hideouts">
       <Hand :hand='hideouts'
@@ -23,14 +23,20 @@
     </div>
     <div>
       <h2>Detective hand: </h2>
-      <Hand :hand='detectiveHand' :onClick='() => {}' isPlayed="[]" />
+      <Hand
+      :hand='detectiveHand'
+      :onClick='() => {}'
+      isPlayed="[]"
+      :revealedHideouts='[]'
+      />
       <h2>Fugitive hand: </h2>
-      <Hand :hand='proposedHideouts' :onClick='returnHideout' isPlayed="[]" />
+      <Hand :hand='proposedHideouts' :onClick='returnHideout' isPlayed="[]" :revealedHideouts='[]'/>
         <button @click='submitHideout'>Submit</button>
       <Hand
       :hand='fugitiveHand'
       :onClick='playHideout'
-      :isPlayed='proposedHideouts' />
+      :isPlayed='proposedHideouts'
+      :revealedHideouts='[]'/>
     </div>
   </div>
 </template>
@@ -132,6 +138,15 @@ export default {
         this.currentPhase = 'Draw'
         this.currentPlayer = 'Detective'
       }
+    },
+    makeGuess: function (number) {
+      this.detectiveGuesses.push(number)
+      if (this.hideouts.includes(number)) {
+        this.revealedHideouts.push(number)
+        alert('GOTTEM!')
+      }
+      this.currentPhase = 'Draw'
+      this.currentPlayer = 'Fugitive'
     }
   }
 }

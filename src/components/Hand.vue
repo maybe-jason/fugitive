@@ -8,6 +8,7 @@
         :suit="card % 2 === 0 ? 2 : 1"
         :onClick="onClick"
         :played="isPlayed.includes(card)"
+        :revealed="card != 0 && revealedHideouts.includes(card)"
         :key='card.value'>
       </li>
     </ul>

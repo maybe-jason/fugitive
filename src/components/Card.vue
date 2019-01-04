@@ -1,5 +1,5 @@
 <template>
-  <div class="card" :class='{ played: played }' @click='onClick(value)'>
+  <div class="card" :class='{ played: played, revealed: revealed }' @click='onClick(value)'>
     <div v-if="Array.isArray(value)">
       {{value[0]}}**
     </div>
@@ -64,5 +64,9 @@ export default {
 
 .played {
   opacity: 0.5;
+}
+
+.revealed {
+  border: 4px solid red;
 }
 </style>
