@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul v-if="hand.length > 0">
+    <ul :class='className' v-if="hand.length > 0">
       <li
         is="card"
         v-for="card in hand"
@@ -12,7 +12,6 @@
         :key='card.value'>
       </li>
     </ul>
-    <h4 v-else>Empty!</h4>
   </div>
 </template>
 
@@ -24,7 +23,7 @@ export default {
   components: {
     Card
   },
-  props: ['hand', 'onClick', 'isPlayed', 'revealedHideouts'],
+  props: ['hand', 'onClick', 'isPlayed', 'revealedHideouts', 'className'],
   computed: {
     revealed: function () {
       return this.revealedHideouts.filter( element => {
@@ -43,8 +42,32 @@ export default {
 </script>
 
 <style lang="css" scoped>
-ul {
+.cardHand {
   display: flex;
+  flex-wrap: wrap;
+  margin-left: auto;
+  margin-right: auto;
+  /* height: 420px; */
+  width: 50%;
+  justify-content: center;
+}
+
+.hideouts {
+  display: flex;
+  flex-wrap: wrap;
+  margin-right: auto;
+  margin-left: auto;
+  width: fit-content;
+  justify-content: center;
+}
+
+.proposedHideouts {
+  display: flex;
+  flex-wrap: wrap;
+  margin-left: auto;
+  margin-right: auto;
+  /* height: 200px; */
+  width: 50%;
   justify-content: center;
 }
 </style>

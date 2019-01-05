@@ -52,7 +52,8 @@ export default {
   height: 200px;
   width: 150px;
   background-color: #cc99ff;
-  margin-right: 10px;
+  margin-right: 15px;
+  margin-bottom: 15px;
   text-align: left;
   text-indent: 10px;
   font-family: "Staatliches", Times, serif;

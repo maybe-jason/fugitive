@@ -11,30 +11,29 @@
         <h3>{{ currentPhase }} phase</h3>
       </div>
       <div>
-        <DetectiveGrid :hideouts='revealedHideouts' :guesses='detectiveGuesses' :onClick='makeGuess'/>
-      </div>
-      <div class="hideouts">
         <Hand :hand='hideouts'
         :onClick='() => {}'
         isPlayed="[]"
-        :revealedHideouts='revealedHideouts'/>
+        :revealedHideouts='revealedHideouts'
+        className="hideouts"/>
       </div>
-      <div>
-        <h2>Detective hand: </h2>
-        <Hand
+      <div class="detective" v-if='this.currentPlayer === "Detective"'>
+        <DetectiveControls
+        :revealedHideouts='revealedHideouts'
+        :detectiveGuesses='detectiveGuesses'
         :hand='detectiveHand'
-        :onClick='() => {}'
-        isPlayed="[]"
-        :revealedHideouts='[]'
+        :onClick='makeGuess'
         />
-        <h2>Fugitive hand: </h2>
-        <Hand :hand='proposedHideouts' :onClick='returnHideout' isPlayed="[]" :revealedHideouts='[]'/>
-          <button @click='submitHideout'>Submit</button>
-        <Hand
-        :hand='fugitiveHand'
-        :onClick='playHideout'
-        :isPlayed='proposedHideouts'
-        :revealedHideouts='[]'/>
+      </div>
+      <div class="fugitive" v-if='this.currentPlayer === "Fugitive"'>
+        <FugitiveControls
+        :fugitiveHand='fugitiveHand'
+        :proposedHideouts='proposedHideouts'
+        :returnHideout='returnHideout'
+        :submitHideout='submitHideout'
+        :playHideout='playHideout'
+        :currentPhase='currentPhase'
+        />
       </div>
     </div>
   </div>
@@ -43,7 +42,8 @@
 <script>
 import Deck from './components/Deck'
 import Hand from './components/Hand'
-import DetectiveGrid from './components/DetectiveGrid.vue'
+import DetectiveControls from './components/DetectiveControls.vue'
+import FugitiveControls from './components/FugitiveControls.vue'
 
 var random = require("random-js")()
 
@@ -52,7 +52,8 @@ export default {
   components: {
     Deck,
     Hand,
-    DetectiveGrid
+    DetectiveControls,
+    FugitiveControls
   },
   data: function () {
     return {
@@ -117,6 +118,7 @@ export default {
           this.hideouts.push(this.proposedHideouts[0])
           this.fugitiveHand.splice(this.fugitiveHand.indexOf(this.proposedHideouts[0]), 1)
           this.proposedHideouts = []
+          this.fugitiveHand.sort(function(a, b){return a - b});
           this.currentPhase = 'Draw'
           this.currentPlayer = 'Detective'
         }
@@ -135,6 +137,7 @@ export default {
             return !this.proposedHideouts.includes(number)
           })
           this.proposedHideouts = []
+          .sort(function(a, b){return a - b});
           this.currentPhase = 'Draw'
           this.currentPlayer = 'Detective'
         }
@@ -149,7 +152,6 @@ export default {
         this.detectiveGuesses.push(number)
         if (this.hideouts.includes(number)) {
           this.revealedHideouts.push(number)
-          alert('GOTTEM!')
         }
         else {
           this.hideouts.filter( element => {
@@ -164,6 +166,7 @@ export default {
         }
         this.currentPhase = 'Draw'
         this.currentPlayer = 'Fugitive'
+        this.detectiveHand.sort(function(a, b){return a - b});
       }
     }
   }
@@ -192,7 +195,17 @@ export default {
 }
 
 .main {
+  text-align: center;
+  justify-content: center;
   font-family: 'Roboto', Helvetica, Arial, sans-serif;
+}
+
+.turn {
+  justify-content: center;
+  text-align: center;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
 }
 
 </style>
