@@ -1,5 +1,5 @@
 <template>
-  <div class="card" :class='{ played: played, revealed: revealed, two: value.length === 2, multiple: value.length > 2 }' @click='onClick(value)'>
+  <div :class="{ card: className === 'card', handCard: className === 'handCard', proposedCard: className === 'proposedCard', perspective: (perspective === 'Detective') && (!revealed), played: played, revealed: revealed, two: value.length === 2, multiple: value.length > 2 }" @click='onClick(value)'>
     <div v-if="Array.isArray(value)">
       {{value[0]}} ({{value.length-1}})
     </div>
@@ -42,13 +42,21 @@ export default {
     revealed: {
       type: Boolean,
       required: false
+    },
+    className: {
+      type: String,
+      required: true
+    },
+    perspective: {
+      type: String,
+      required: false
     }
   }
 }
 </script>
 
 <style lang="css" scoped>
-.card {
+.card, .handCard, .proposedCard {
   height: 200px;
   width: 150px;
   background-color: #cc99ff;
@@ -60,6 +68,20 @@ export default {
   font-size: 50px;
   cursor: pointer;
   box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.handCard:hover {
+  --translation: 10;
+  transform: translateY(calc(var(--translation) * -1px));
+  /* transform: translateY(-10px); */
+  transition-duration: .3s;
+}
+
+.proposedCard:hover {
+  --translation: 10;
+  transform: translateY(calc(var(--translation) * 1px));
+  /* transform: translateY(-10px); */
+  transition-duration: .3s;
 }
 
 .two {
@@ -76,6 +98,11 @@ export default {
 
 .revealed {
   background-color: #FFB8B8;
+}
+
+.perspective {
+  color: transparent;
+  user-select: none;
 }
 
 .two.revealed {

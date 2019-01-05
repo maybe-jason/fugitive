@@ -41,6 +41,13 @@ export default {
   font-size: 50px;
   cursor: pointer;
   box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2), 7px 7px 0 0 #BA74FF, 13px 13px 0 0 #8451B5;
-  /* transform: rotate(270deg); */
 }
+
+.deck:hover {
+  --translation: 1.03;
+  transform: scale(calc(var(--translation)));
+  transition-duration: .3s;
+}
+
+
 </style>

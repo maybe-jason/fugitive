@@ -3,12 +3,14 @@
     <ul :class='className' v-if="hand.length > 0">
       <li
         is="card"
+        :className='cardClass'
         v-for="card in hand"
         :value="card"
         :suit="card % 2 === 0 ? 2 : 1"
         :onClick="onClick"
         :played="isPlayed.includes(card)"
         :revealed="revealed.includes(card) || revealed.includes(card[0])"
+        :perspective='perspective'
         :key='card.value'>
       </li>
     </ul>
@@ -23,7 +25,7 @@ export default {
   components: {
     Card
   },
-  props: ['hand', 'onClick', 'isPlayed', 'revealedHideouts', 'className'],
+  props: ['hand', 'onClick', 'isPlayed', 'revealedHideouts', 'className', 'cardClass', 'perspective'],
   computed: {
     revealed: function () {
       return this.revealedHideouts.filter( element => {
@@ -42,7 +44,7 @@ export default {
 </script>
 
 <style lang="css" scoped>
-.cardHand {
+.cardHand, .proposedHideouts {
   display: flex;
   flex-wrap: wrap;
   margin-left: auto;
@@ -61,13 +63,4 @@ export default {
   justify-content: center;
 }
 
-.proposedHideouts {
-  display: flex;
-  flex-wrap: wrap;
-  margin-left: auto;
-  margin-right: auto;
-  /* height: 200px; */
-  width: 50%;
-  justify-content: center;
-}
 </style>

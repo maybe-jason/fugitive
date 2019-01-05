@@ -6,7 +6,9 @@
     :onClick='() => {}'
     isPlayed="[]"
     :revealedHideouts='[]'
-    className='cardHand'/>
+    className='cardHand'
+    cardClass='card'
+    />
     <DetectiveGrid :hideouts='revealedHideouts' :guesses='detectiveGuesses' :onClick='onClick'/>
   </div>
 </template>

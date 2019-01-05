@@ -15,7 +15,9 @@
         :onClick='() => {}'
         isPlayed="[]"
         :revealedHideouts='revealedHideouts'
-        className="hideouts"/>
+        className="hideouts"
+        cardClass='card'
+        :perspective='currentPlayer'/>
       </div>
       <div class="detective" v-if='this.currentPlayer === "Detective"'>
         <DetectiveControls

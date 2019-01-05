@@ -5,7 +5,8 @@
     :onClick='returnHideout'
     isPlayed="[]"
     :revealedHideouts='[]'
-    className="proposedHideouts"/>
+    className="proposedHideouts"
+    cardClass='proposedCard'/>
     <div v-if='proposedHideouts.length > 0'>
       <button @click='submitHideout'>Play Hideouts</button>
     </div>
@@ -18,7 +19,8 @@
     :onClick='playHideout'
     :isPlayed='proposedHideouts'
     :revealedHideouts='[]'
-    className="cardHand"/>
+    className="cardHand"
+    cardClass='handCard'/>
   </div>
 </template>
 
