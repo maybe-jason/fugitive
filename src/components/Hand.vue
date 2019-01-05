@@ -8,7 +8,7 @@
         :suit="card % 2 === 0 ? 2 : 1"
         :onClick="onClick"
         :played="isPlayed.includes(card)"
-        :revealed="card != 0 && revealedHideouts.includes(card)"
+        :revealed="revealed.includes(card) || revealed.includes(card[0])"
         :key='card.value'>
       </li>
     </ul>
@@ -24,7 +24,21 @@ export default {
   components: {
     Card
   },
-  props: ['hand', 'onClick', 'isPlayed', 'revealedHideouts']
+  props: ['hand', 'onClick', 'isPlayed', 'revealedHideouts'],
+  computed: {
+    revealed: function () {
+      return this.revealedHideouts.filter( element => {
+        if (this.revealedHideouts.includes(element)) {
+          return true
+        }
+        if (Array.isArray(element)) {
+          if (this.revealedHideouts.includes(element[0])) {
+            return true
+          }
+        }
+      })
+    }
+  }
 }
 </script>
 

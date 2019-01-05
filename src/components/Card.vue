@@ -1,7 +1,7 @@
 <template>
-  <div class="card" :class='{ played: played, revealed: revealed }' @click='onClick(value)'>
+  <div class="card" :class='{ played: played, revealed: revealed, two: value.length === 2, multiple: value.length > 2 }' @click='onClick(value)'>
     <div v-if="Array.isArray(value)">
-      {{value[0]}}**
+      {{value[0]}} ({{value.length-1}})
     </div>
     <div v-else>
       {{value}}
@@ -52,14 +52,21 @@ export default {
   height: 200px;
   width: 150px;
   background-color: #cc99ff;
-  box-shadow: 2px 2px;
-  border: 2px solid black;
   margin-right: 10px;
   text-align: left;
   text-indent: 10px;
-  border-radius: 5px;
   font-family: "Staatliches", Times, serif;
   font-size: 50px;
+  cursor: pointer;
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.two {
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2), 7px 7px 0 0 #BA74FF;
+}
+
+.multiple {
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2), 7px 7px 0 0 #BA74FF, 13px 13px 0 0 #8451B5;
 }
 
 .played {
@@ -67,6 +74,14 @@ export default {
 }
 
 .revealed {
-  border: 4px solid red;
+  background-color: #FFB8B8;
+}
+
+.two.revealed {
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2), 7px 7px 0 0 #FF9C9C;
+}
+
+.multiple.revealed {
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2), 7px 7px 0 0 #FF9C9C, 13px 13px 0 0 #FF6464;
 }
 </style>
