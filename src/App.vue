@@ -1,9 +1,9 @@
 <template>
   <div id="app">
     <div class="decks">
-      <Deck :cards='firstDeck' :onClick='drawCard' :drawDeck='1' />
-      <Deck :cards='secondDeck' :onClick='drawCard' :drawDeck='2' />
-      <Deck :cards='thirdDeck' :onClick='drawCard' :drawDeck='3' />
+      <Deck :cards='firstDeck' :onClick='drawCard' :drawDeck='1' :currentPhase='currentPhase' />
+      <Deck :cards='secondDeck' :onClick='drawCard' :drawDeck='2' :currentPhase='currentPhase' />
+      <Deck :cards='thirdDeck' :onClick='drawCard' :drawDeck='3' :currentPhase='currentPhase' />
     </div>
     <div class="main">
       <div class="turn">
@@ -25,6 +25,7 @@
         :detectiveGuesses='detectiveGuesses'
         :hand='detectiveHand'
         :onClick='makeGuess'
+        :currentPhase='currentPhase'
         />
       </div>
       <div class="fugitive" v-if='this.currentPlayer === "Fugitive"'>
@@ -35,6 +36,7 @@
         :submitHideout='submitHideout'
         :playHideout='playHideout'
         :currentPhase='currentPhase'
+        :turnNumber='turnNumber'
         />
       </div>
     </div>
@@ -70,7 +72,9 @@ export default {
       revealedHideouts: [0],
       currentPlayer: 'Fugitive',
       currentPhase: 'Draw',
-      turnNumber: 1
+      turnNumber: 1,
+      extraDraw: true,
+      extraPlay: true,
     }
   },
   methods: {
@@ -92,8 +96,12 @@ export default {
         if (this.currentPlayer === 'Fugitive') {
           this.fugitiveHand.push(drawDeck.pop())
           // this.fugitiveHand.sort(function(a, b){return a-b})
-          this.currentPhase = 'Play'
-          // this.currentPlayer = 'Detective'
+          if (this.turnNumber != 1 || !this.extraDraw) {
+            this.currentPhase = 'Play'
+          }
+          else {
+            this.extraDraw = false
+          }
         }
         else if (this.currentPlayer === 'Detective') {
           this.detectiveHand.push(drawDeck.pop())
@@ -113,16 +121,30 @@ export default {
     },
     submitHideout: function () {
       if (this.proposedHideouts.length == 1) {
-        if (this.proposedHideouts[0] - this.hideouts[this.hideouts.length-1] > 3) {
+        if (this.proposedHideouts[0] - this.hideouts[this.hideouts.length-1] > 3 || this.proposedHideouts[0] < this.hideouts[this.hideouts.length-1] || this.proposedHideouts[0] < this.hideouts[this.hideouts.length-1][0]) {
           alert('add sprint cards')
         }
         else {
           this.hideouts.push(this.proposedHideouts[0])
           this.fugitiveHand.splice(this.fugitiveHand.indexOf(this.proposedHideouts[0]), 1)
+          if (this.proposedHideouts[0] == 42) {
+            this.currentPhase = 'SD'
+            alert('The fugitive has escaped!')
+          }
           this.proposedHideouts = []
           this.fugitiveHand.sort(function(a, b){return a - b});
-          this.currentPhase = 'Draw'
-          this.currentPlayer = 'Detective'
+          // this.currentPhase = 'Draw'
+          if (this.turnNumber != 1 || !this.extraPlay) {
+            this.currentPlayer = 'Detective'
+            this.currentPhase = 'Draw'
+          }
+          else {
+            this.extraPlay = false;
+          }
+          if (this.proposedHideouts[0] == 42) {
+            this.currentPhase = 'SD'
+            alert('The fugitive has escaped!')
+          }
         }
       }
       else if (this.proposedHideouts.length > 1) {
@@ -130,18 +152,32 @@ export default {
         const sprintSum = sprintCards.reduce( (acc, curr) => {
           return acc + (curr%2 == 0 ? 2 : 1)
         }, 0)
-        if ( (this.proposedHideouts[0] - sprintSum - this.hideouts[this.hideouts.length-1]) > 3) {
+        if ( (this.proposedHideouts[0] - sprintSum - this.hideouts[this.hideouts.length-1]) > 3 ||
+        (this.proposedHideouts[0] - sprintSum - this.hideouts[this.hideouts.length-1][0]) > 3
+        ) {
           alert('not in range')
+        }
+        else if (this.proposedHideouts[0] < this.hideouts[this.hideouts.length-1] || this.proposedHideouts[0] < this.hideouts[this.hideouts.length-1][0]) {
+          alert('invalid hideout')
         }
         else {
           this.hideouts.push(this.proposedHideouts)
           this.fugitiveHand = this.fugitiveHand.filter( number => {
             return !this.proposedHideouts.includes(number)
           })
+          if (this.proposedHideouts[0] == 42) {
+            this.currentPhase = 'SD'
+            alert('The fugitive has escaped!')
+          }
           this.proposedHideouts = []
-          .sort(function(a, b){return a - b});
-          this.currentPhase = 'Draw'
-          this.currentPlayer = 'Detective'
+          this.fugitiveHand.sort(function(a, b){return a - b});
+          if (this.turnNumber != 1 || !this.extraPlay) {
+            this.currentPlayer = 'Detective'
+            this.currentPhase = 'Draw'
+          }
+          else {
+            this.extraPlay = false;
+          }
         }
       }
       else {
@@ -150,7 +186,7 @@ export default {
       }
     },
     makeGuess: function (number) {
-      if (this.currentPhase === 'Guess' && !this.detectiveGuesses.includes(number)) {
+      if (this.currentPhase === 'Guess') {
         this.detectiveGuesses.push(number)
         if (this.hideouts.includes(number)) {
           this.revealedHideouts.push(number)
@@ -194,6 +230,8 @@ export default {
   left: 100px;
   overflow-x: hidden;
   padding-top: 20px;
+  padding-right: 13px;
+  /* background-color: blue; */
 }
 
 .main {

@@ -1,6 +1,6 @@
 <template>
   <div>
-    <ul :class='className' v-if="hand.length > 0">
+    <ul :class=' { cardHand: className==="cardHand", proposedHideouts: className==="proposedHideouts", hideouts: className==="hideouts", glow: currentPhase==="Play"}' v-if="hand.length > 0">
       <li
         is="card"
         :className='cardClass'
@@ -25,7 +25,7 @@ export default {
   components: {
     Card
   },
-  props: ['hand', 'onClick', 'isPlayed', 'revealedHideouts', 'className', 'cardClass', 'perspective'],
+  props: ['hand', 'onClick', 'isPlayed', 'revealedHideouts', 'className', 'cardClass', 'perspective', 'currentPhase'],
   computed: {
     revealed: function () {
       return this.revealedHideouts.filter( element => {
@@ -50,8 +50,23 @@ export default {
   margin-left: auto;
   margin-right: auto;
   /* height: 420px; */
-  width: 50%;
+  width: 49%;
   justify-content: center;
+  /* background-color: blue; */
+  padding-top: 15px;
+  padding-right: 20px;
+}
+
+@keyframes glowing {
+  0% { box-shadow: 0 0 10px #56E0AE; }
+  20% { box-shadow: 0 0 30px #56E0AE; }
+  40% { box-shadow: 0 0 50px #56E0AE; }
+  60% { box-shadow: 0 0 30px #56E0AE; }
+  100% { box-shadow: 0 0 10px #56E0AE;}
+}
+
+.glow {
+  animation: glowing 3000ms infinite;
 }
 
 .hideouts {
@@ -59,7 +74,7 @@ export default {
   flex-wrap: wrap;
   margin-right: auto;
   margin-left: auto;
-  width: fit-content;
+  width: 49%;
   justify-content: center;
 }
 

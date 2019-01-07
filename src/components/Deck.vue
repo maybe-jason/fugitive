@@ -1,6 +1,6 @@
 <template>
   <!-- <div> -->
-    <div class='deck' @click='onClick(drawDeck)'>
+    <div class='deck' @click='onClick(drawDeck)' :class='{ glow: currentPhase === "Draw"}'>
       <div v-if='drawDeck==1'>
         4-14 <br><br>
         &nbsp;&nbsp;({{cards.length}})
@@ -21,7 +21,7 @@
 <script>
 export default {
   name: 'deck',
-  props: ['cards', 'onClick', 'drawDeck'],
+  props: ['cards', 'onClick', 'drawDeck', 'currentPhase'],
   methods: {
     pushToDeck: function (card) {
       this.cards.push(card)
@@ -43,8 +43,20 @@ export default {
   box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2), 7px 7px 0 0 #BA74FF, 13px 13px 0 0 #8451B5;
 }
 
-.deck:hover {
-  --translation: 1.03;
+@keyframes glowing {
+  0% { box-shadow: 0 0 10px #56E0AE, 7px 7px 0 0 #BA74FF, 13px 13px 0 0 #8451B5; }
+  20% { box-shadow: 0 0 30px #56E0AE, 7px 7px 0 0 #BA74FF, 13px 13px 0 0 #8451B5; }
+  40% { box-shadow: 0 0 50px #56E0AE, 7px 7px 0 0 #BA74FF, 13px 13px 0 0 #8451B5; }
+  60% { box-shadow: 0 0 30px #56E0AE, 7px 7px 0 0 #BA74FF, 13px 13px 0 0 #8451B5; }
+  100% { box-shadow: 0 0 10px #56E0AE, 7px 7px 0 0 #BA74FF, 13px 13px 0 0 #8451B5; }
+}
+
+.glow {
+  animation: glowing 3000ms infinite;
+}
+
+.glow:hover {
+  --translation: 1.08;
   transform: scale(calc(var(--translation)));
   transition-duration: .3s;
 }

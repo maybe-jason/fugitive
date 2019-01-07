@@ -9,7 +9,10 @@
     className='cardHand'
     cardClass='card'
     />
-    <DetectiveGrid :hideouts='revealedHideouts' :guesses='detectiveGuesses' :onClick='onClick'/>
+    <DetectiveGrid
+    :hideouts='revealedHideouts' :guesses='detectiveGuesses'
+    :onClick='onClick'
+    :currentPhase='currentPhase'/>
   </div>
 </template>
 
@@ -23,7 +26,7 @@ export default {
     DetectiveGrid,
     Hand
   },
-  props: ['revealedHideouts', 'detectiveGuesses', 'hand', 'onClick']
+  props: ['revealedHideouts', 'detectiveGuesses', 'hand', 'onClick', 'currentPhase']
 }
 </script>
 

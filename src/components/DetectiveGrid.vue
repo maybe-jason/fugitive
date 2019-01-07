@@ -1,6 +1,6 @@
 <template>
   <div>
-    <div class="grid-container">
+    <div :class='{ gridContainer: true, glow: currentPhase === "Guess"}'>
       <div @click='onClick(1)' class="grid-item" :class="{ wrong: wrong.includes(1), correct: hideouts.includes(1) }">1</div>
       <div @click='onClick(2)' class="grid-item" :class="{ wrong: wrong.includes(2), correct: hideouts.includes(2) }">2</div>
       <div @click='onClick(3)' class="grid-item" :class="{ wrong: wrong.includes(3), correct: hideouts.includes(3) }">3</div>
@@ -50,7 +50,7 @@
 <script>
 export default {
   name: 'detectiveGrid',
-  props: ['hideouts', 'guesses', 'onClick'],
+  props: ['hideouts', 'guesses', 'onClick', 'currentPhase'],
   computed: {
     wrong: function () {
       return this.guesses.filter( number => {
@@ -63,11 +63,27 @@ export default {
 
 <style lang="css" scoped>
 
-.grid-container {
+.gridContainer {
   display: grid;
   justify-content: center;
   grid-template-columns: 50px 50px 50px 50px 50px 50px 50px;
   padding: 10px;
+  margin-left: auto;
+  margin-right: auto;
+  width: fit-content;
+  /* background-color: blue; */
+}
+
+@keyframes glowing {
+  0% { box-shadow: 0 0 10px #56E0AE; }
+  20% { box-shadow: 0 0 30px #56E0AE; }
+  40% { box-shadow: 0 0 50px #56E0AE; }
+  60% { box-shadow: 0 0 30px #56E0AE; }
+  100% { box-shadow: 0 0 10px #56E0AE;}
+}
+
+.glow {
+  animation: glowing 3000ms infinite;
 }
 
 .grid-item {
@@ -80,6 +96,7 @@ export default {
   font-family: "Staatliches", Times, serif;
   font-size: 12px;
   cursor: pointer;
+  box-shadow: 2px 2px 2px 0 rgba(0, 0, 0, 0.2);
 }
 
 .wrong {
