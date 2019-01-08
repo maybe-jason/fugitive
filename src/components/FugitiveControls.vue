@@ -7,9 +7,8 @@
     :revealedHideouts='[]'
     className="proposedHideouts"
     cardClass='proposedCard'/>
-    <button class='passButton' @click='submitHideout' :disabled='currentPhase !== "Play" || turnNumber == 1'>Pass</button>
+    <button class='passButton' @click='submitHideout' :disabled='currentPhase !== "Play" || proposedHideouts.length > 0'>Pass</button>
     <button class='submitButton' @click='submitHideout' :disabled='currentPhase !== "Play" || proposedHideouts.length == 0'>Play Hideouts</button>
-    <h2>Fugitive hand: </h2>
     <Hand
     :hand='fugitiveHand'
     :onClick='playHideout'

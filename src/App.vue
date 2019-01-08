@@ -6,9 +6,11 @@
       <Deck :cards='thirdDeck' :onClick='drawCard' :drawDeck='3' :currentPhase='currentPhase' />
     </div>
     <div class="main">
+      <button @click='sendMessage' name="button">Meme</button>
       <div class="turn">
+        <h1>You are the {{ playerID }}</h1>
         <h1>{{ currentPlayer }}'s turn</h1>
-        <h3>{{ currentPhase }} phase</h3>
+        <h3>{{ currentPhase }}</h3>
       </div>
       <div>
         <Hand :hand='hideouts'
@@ -48,6 +50,7 @@ import Deck from './components/Deck'
 import Hand from './components/Hand'
 import DetectiveControls from './components/DetectiveControls.vue'
 import FugitiveControls from './components/FugitiveControls.vue'
+import io from 'socket.io-client';
 
 var random = require("random-js")()
 
@@ -75,6 +78,8 @@ export default {
       turnNumber: 1,
       extraDraw: true,
       extraPlay: true,
+      playerID: '',
+      socket: io('localhost:3001'),
     }
   },
   methods: {
@@ -204,9 +209,32 @@ export default {
         }
         this.currentPhase = 'Draw'
         this.currentPlayer = 'Fugitive'
+        this.turnNumber += 1
         this.detectiveHand.sort(function(a, b){return a - b});
       }
+    },
+    sendMessage: function (e) {
+      e.preventDefault()
+      this.socket.emit('SEND_MESSAGE', {
+        user: this.currentPlayer,
+        message: 'memer'
+      })
     }
+  },
+  mounted: function () {
+    this.socket.on('MESSAGE_RECEIVED', (data) => {
+      alert(data.message)
+    })
+    this.socket.on('FUGITIVE_CONNECTED', (data) => {
+      if (this.playerID === '') {
+        this.playerID = 'Fugitive'
+      }
+    })
+    this.socket.on('DETECTIVE_CONNECTED', (data) => {
+      if (this.playerID === '') {
+        this.playerID = 'Detective'
+      }
+    })
   }
 }
 </script>

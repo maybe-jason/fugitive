@@ -1,6 +1,9 @@
 <template>
   <div>
-    <h2>Detective hand: </h2>
+    <DetectiveGrid
+    :hideouts='revealedHideouts' :guesses='detectiveGuesses'
+    :onClick='onClick'
+    :currentPhase='currentPhase'/>
     <Hand
     :hand='hand'
     :onClick='() => {}'
@@ -9,10 +12,6 @@
     className='cardHand'
     cardClass='card'
     />
-    <DetectiveGrid
-    :hideouts='revealedHideouts' :guesses='detectiveGuesses'
-    :onClick='onClick'
-    :currentPhase='currentPhase'/>
   </div>
 </template>
 
