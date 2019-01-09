@@ -6,5 +6,5 @@
 
 `cd server && npm install --save socket.io`
 
-`node index.js` to start the game server on port `3001`
+`node index.js` to start the game server on port `3001`  
 `npm run serve` to initialize the client at `localhost:8080`
