@@ -1,6 +1,7 @@
 <template>
   <!-- <div> -->
-    <div class='deck' @click='onClick(drawDeck)' :class='{ glow: currentPhase === "Draw"}'>
+    <div class='deck' @click='onClick(drawDeck)' :class='{ glow: currentPhase === "Draw" && currentPlayer === playerID }'
+    :disabled='currentPlayer !== playerID'>
       <div v-if='drawDeck==1'>
         4-14 <br><br>
         &nbsp;&nbsp;({{cards.length}})
@@ -21,7 +22,7 @@
 <script>
 export default {
   name: 'deck',
-  props: ['cards', 'onClick', 'drawDeck', 'currentPhase'],
+  props: ['cards', 'onClick', 'drawDeck', 'currentPhase', 'currentPlayer', 'playerID'],
   methods: {
     pushToDeck: function (card) {
       this.cards.push(card)

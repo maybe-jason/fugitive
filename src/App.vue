@@ -1,12 +1,14 @@
 <template>
   <div id="app">
     <div class="decks">
-      <Deck :cards='firstDeck' :onClick='drawCard' :drawDeck='1' :currentPhase='currentPhase' />
-      <Deck :cards='secondDeck' :onClick='drawCard' :drawDeck='2' :currentPhase='currentPhase' />
-      <Deck :cards='thirdDeck' :onClick='drawCard' :drawDeck='3' :currentPhase='currentPhase' />
+      <Deck :cards='firstDeck' :onClick='drawCard' :drawDeck='1' :currentPhase='currentPhase' :currentPlayer='currentPlayer'
+      :playerID='playerID'/>
+      <Deck :cards='secondDeck' :onClick='drawCard' :drawDeck='2' :currentPhase='currentPhase' :currentPlayer='currentPlayer'
+      :playerID='playerID'/>
+      <Deck :cards='thirdDeck' :onClick='drawCard' :drawDeck='3' :currentPhase='currentPhase' :currentPlayer='currentPlayer'
+      :playerID='playerID'/>
     </div>
     <div class="main">
-      <button @click='sendMessage' name="button">Meme</button>
       <div class="turn">
         <h1>You are the {{ playerID }}</h1>
         <h1>{{ currentPlayer }}'s turn</h1>
@@ -19,9 +21,9 @@
         :revealedHideouts='revealedHideouts'
         className="hideouts"
         cardClass='card'
-        :perspective='currentPlayer'/>
+        :perspective='playerID'/>
       </div>
-      <div class="detective" v-if='this.currentPlayer === "Detective"'>
+      <div class="detective" v-if='this.playerID === "Detective"'>
         <DetectiveControls
         :revealedHideouts='revealedHideouts'
         :detectiveGuesses='detectiveGuesses'
@@ -30,7 +32,7 @@
         :currentPhase='currentPhase'
         />
       </div>
-      <div class="fugitive" v-if='this.currentPlayer === "Fugitive"'>
+      <div class="fugitive" v-if='this.playerID === "Fugitive"'>
         <FugitiveControls
         :fugitiveHand='fugitiveHand'
         :proposedHideouts='proposedHideouts'
@@ -84,57 +86,105 @@ export default {
   },
   methods: {
     drawCard: function (deckNum) {
-      if (this.currentPhase === 'Draw') {
-        let drawDeck;
-        if (deckNum === 1) {
-          drawDeck = this.firstDeck
-        }
-        else if (deckNum === 2) {
-          drawDeck = this.secondDeck
-        }
-        else {
-          drawDeck = this.thirdDeck
-        }
-        if (drawDeck.length === 0) {
-          alert('deck empty!')
-        }
-        if (this.currentPlayer === 'Fugitive') {
-          this.fugitiveHand.push(drawDeck.pop())
-          // this.fugitiveHand.sort(function(a, b){return a-b})
-          if (this.turnNumber != 1 || !this.extraDraw) {
-            this.currentPhase = 'Play'
-          }
-          else {
-            this.extraDraw = false
-          }
-        }
-        else if (this.currentPlayer === 'Detective') {
-          this.detectiveHand.push(drawDeck.pop())
-          // this.detectiveHand.sort(function(a, b){return a-b})
-          this.currentPhase = 'Guess'
-        }
+      if (this.currentPhase === 'Draw' && this.currentPlayer === this.playerID) {
+        this.socket.emit('DRAW_CARD', {
+          deckNum: deckNum
+        })
       }
     },
     playHideout: function (card) {
       if (this.currentPhase === 'Play' && !this.proposedHideouts.includes(card)) {
-        this.proposedHideouts.push(card)
-        // this.fugitiveHand.splice(this.fugitiveHand.indexOf(card), 1)
+        this.socket.emit('PLAY_HIDEOUT', {
+          card: card
+        })
       }
     },
     returnHideout: function (card) {
-      this.proposedHideouts.splice(this.proposedHideouts.indexOf(card), 1)
+      this.socket.emit('RETURN_HIDEOUT', {
+        card: card
+      })
     },
     submitHideout: function () {
+      this.socket.emit('SUBMIT_HIDEOUT')
+    },
+    makeGuess: function (number) {
+      if (this.currentPhase === 'Guess') {
+        this.socket.emit('MAKE_GUESS', {
+          number: number
+        })
+      }
+    },
+  },
+  mounted: function () {
+    this.socket.on('FUGITIVE_CONNECTED', () => {
+      if (this.playerID === '') {
+        this.playerID = 'Fugitive'
+      }
+    })
+    this.socket.on('DETECTIVE_CONNECTED', () => {
+      if (this.playerID === '') {
+        this.playerID = 'Detective'
+      }
+      if (this.playerID === 'Fugitive') {
+        this.socket.emit('SYNC_DECKS', {
+          firstDeck: this.firstDeck,
+          secondDeck: this.secondDeck,
+          thirdDeck: this.thirdDeck
+        })
+      }
+    })
+    this.socket.on('SYNC_DECKS_R', data => {
+      this.firstDeck = data.firstDeck
+      this.secondDeck = data.secondDeck
+      this.thirdDeck = data.thirdDeck
+    })
+    this.socket.on('DRAW_CARD_R', data => {
+      let drawDeck;
+      if (data.deckNum == 1) {
+        drawDeck = this.firstDeck
+      }
+      else if (data.deckNum == 2) {
+        drawDeck = this.secondDeck
+      }
+      else {
+        drawDeck = this.thirdDeck
+      }
+      if (drawDeck.length == 0) {
+        alert('deck empty!')
+      }
+      if (this.currentPlayer === 'Fugitive') {
+        this.fugitiveHand.push(drawDeck.pop())
+        // this.fugitiveHand.sort(function(a, b){return a-b})
+        if (this.turnNumber != 1 || !this.extraDraw) {
+          this.currentPhase = 'Play'
+        }
+        else {
+          this.extraDraw = false
+        }
+      }
+      else if (this.currentPlayer === 'Detective') {
+        this.detectiveHand.push(drawDeck.pop())
+        // this.detectiveHand.sort(function(a, b){return a-b})
+        this.currentPhase = 'Guess'
+      }
+    })
+    this.socket.on('PLAY_HIDEOUT_R', data => {
+      this.proposedHideouts.push(data.card)
+    })
+    this.socket.on('RETURN_HIDEOUT_R', data => {
+      this.proposedHideouts.splice(this.proposedHideouts.indexOf(data.card), 1)
+    })
+    this.socket.on('SUBMIT_HIDEOUT_R', () => {
       if (this.proposedHideouts.length == 1) {
         if (this.proposedHideouts[0] - this.hideouts[this.hideouts.length-1] > 3 || this.proposedHideouts[0] < this.hideouts[this.hideouts.length-1] || this.proposedHideouts[0] < this.hideouts[this.hideouts.length-1][0]) {
-          alert('add sprint cards')
+          // alert('add sprint cards')
         }
         else {
           this.hideouts.push(this.proposedHideouts[0])
           this.fugitiveHand.splice(this.fugitiveHand.indexOf(this.proposedHideouts[0]), 1)
           if (this.proposedHideouts[0] == 42) {
             this.currentPhase = 'SD'
-            alert('The fugitive has escaped!')
+            // alert('The fugitive has escaped!')
           }
           this.proposedHideouts = []
           this.fugitiveHand.sort(function(a, b){return a - b});
@@ -148,7 +198,7 @@ export default {
           }
           if (this.proposedHideouts[0] == 42) {
             this.currentPhase = 'SD'
-            alert('The fugitive has escaped!')
+            // alert('The fugitive has escaped!')
           }
         }
       }
@@ -160,10 +210,10 @@ export default {
         if ( (this.proposedHideouts[0] - sprintSum - this.hideouts[this.hideouts.length-1]) > 3 ||
         (this.proposedHideouts[0] - sprintSum - this.hideouts[this.hideouts.length-1][0]) > 3
         ) {
-          alert('not in range')
+          // alert('not in range')
         }
         else if (this.proposedHideouts[0] < this.hideouts[this.hideouts.length-1] || this.proposedHideouts[0] < this.hideouts[this.hideouts.length-1][0]) {
-          alert('invalid hideout')
+          // alert('invalid hideout')
         }
         else {
           this.hideouts.push(this.proposedHideouts)
@@ -172,7 +222,7 @@ export default {
           })
           if (this.proposedHideouts[0] == 42) {
             this.currentPhase = 'SD'
-            alert('The fugitive has escaped!')
+            // alert('The fugitive has escaped!')
           }
           this.proposedHideouts = []
           this.fugitiveHand.sort(function(a, b){return a - b});
@@ -189,51 +239,27 @@ export default {
         this.currentPhase = 'Draw'
         this.currentPlayer = 'Detective'
       }
-    },
-    makeGuess: function (number) {
-      if (this.currentPhase === 'Guess') {
-        this.detectiveGuesses.push(number)
-        if (this.hideouts.includes(number)) {
-          this.revealedHideouts.push(number)
-        }
-        else {
-          this.hideouts.filter( element => {
-            if (Array.isArray(element)) {
-              if (element[0] == number) {
-                for (let i = 0; i < element.length; i++) {
-                  this.revealedHideouts.push(element[i])
-                }
+    })
+    this.socket.on('MAKE_GUESS_R', data => {
+      this.detectiveGuesses.push(data.number)
+      if (this.hideouts.includes(data.number)) {
+        this.revealedHideouts.push(data.number)
+      }
+      else {
+        this.hideouts.filter( element => {
+          if (Array.isArray(element)) {
+            if (element[0] == data.number) {
+              for (let i = 0; i < element.length; i++) {
+                this.revealedHideouts.push(element[i])
               }
             }
-          })
-        }
-        this.currentPhase = 'Draw'
-        this.currentPlayer = 'Fugitive'
-        this.turnNumber += 1
-        this.detectiveHand.sort(function(a, b){return a - b});
+          }
+        })
       }
-    },
-    sendMessage: function (e) {
-      e.preventDefault()
-      this.socket.emit('SEND_MESSAGE', {
-        user: this.currentPlayer,
-        message: 'memer'
-      })
-    }
-  },
-  mounted: function () {
-    this.socket.on('MESSAGE_RECEIVED', (data) => {
-      alert(data.message)
-    })
-    this.socket.on('FUGITIVE_CONNECTED', (data) => {
-      if (this.playerID === '') {
-        this.playerID = 'Fugitive'
-      }
-    })
-    this.socket.on('DETECTIVE_CONNECTED', (data) => {
-      if (this.playerID === '') {
-        this.playerID = 'Detective'
-      }
+      this.currentPhase = 'Draw'
+      this.currentPlayer = 'Fugitive'
+      this.turnNumber += 1
+      this.detectiveHand.sort(function(a, b){return a - b});
     })
   }
 }
